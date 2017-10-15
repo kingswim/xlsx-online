@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>SlickGrid example 3: Editing</title>
+  <link rel="stylesheet" href="./SlickGrid/slick.grid.css" type="text/css"/>
+  <link rel="stylesheet" href="./SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css" type="text/css"/>
+  <link rel="stylesheet" href="./SlickGrid/examples/examples.css" type="text/css"/>
+  <style>
+    .cell-title {
+      font-weight: bold;
+    }
+
+    .cell-effort-driven {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div style="position:relative">
+  <div style="width:600px;">
+    <div id="myGrid" style="width:100%;height:500px;"></div>
+  </div>
+
+  <div class="options-panel">
+    <h2>Demonstrates:</h2>
+    <ul>
+      <li>adding basic keyboard navigation and editing</li>
+      <li>custom editors and validators</li>
+      <li>auto-edit settings</li>
+    </ul>
+
+    <h2>Options:</h2>
+    <button onclick="grid.setOptions({autoEdit:true})">Auto-edit ON</button>
+    &nbsp;
+    <button onclick="grid.setOptions({autoEdit:false})">Auto-edit OFF</button>
+      <h2>View Source:</h2>
+      <ul>
+          <li><A href="https://github.com/mleibman/SlickGrid/blob/gh-pages/examples/example3-editing.html" target="_sourcewindow"> View the source for this example on Github</a></li>
+      </ul>
+  </div>
+</div>
+
+<script src="./SlickGrid/lib/firebugx.js"></script>
+
+<script src="./SlickGrid/lib/jquery-1.7.min.js"></script>
+<script src="./SlickGrid/lib/jquery-ui-1.8.16.custom.min.js"></script>
+<script src="./SlickGrid/lib/jquery.event.drag-2.2.js"></script>
+
+<script src="./SlickGrid/slick.core.js"></script>
+<script src="./SlickGrid/plugins/slick.cellrangedecorator.js"></script>
+<script src="./SlickGrid/plugins/slick.cellrangeselector.js"></script>
+<script src="./SlickGrid/plugins/slick.cellselectionmodel.js"></script>
+<script src="./SlickGrid/slick.formatters.js"></script>
+<script src="./SlickGrid/slick.editors.js"></script>
+<script src="./SlickGrid/slick.grid.js"></script>
+
+<script>
+  function requiredFieldValidator(value) {
+    if (value == null || value == undefined || !value.length) {
+      return {valid: false, msg: "This is a required field"};
+    } else {
+      return {valid: true, msg: null};
+    }
+  }
+
+  var grid;
+  var data = [];
+  var tempdate=localStorage.getItem('xlsxcontent');
+  var usedate = JSON.parse(tempdate);  
+  alert(tempdate);
+  var  rows = usedate['Sheet1'];
+  var arraylength = rows.map(function(x){
+     return x.length;;
+  });
+  var maxcol = Math.max.apply(null,arraylength);
+  var  maxrow = rows.length;
+  // var columns = [
+  //  {id: "A", name: "A", field: "A", width: 80,editor: Slick.Editors.Text},
+  //  {id: "B", name: "B", field: "B", width: 80,editor: Slick.Editors.Text},
+  //  {id: "C", name: "C", field: "C", width: 80,editor: Slick.Editors.Text},
+  //  {id: "D", name: "D", field: "D", width: 80,editor: Slick.Editors.Text},
+  //  {id: "E", name: "E", field: "E", width: 80,editor: Slick.Editors.Text},
+  //  {id: "F", name: "F", field: "F", width: 80,editor: Slick.Editors.Text},
+  //  {id: "G", name: "G", field: "G", width: 80,editor: Slick.Editors.Text},
+  // ];
+ var columns=[];
+ for(var i=0;i<maxcol;i++){
+     item={};
+     item['id']=String.fromCharCode('A'.charCodeAt()+i);
+     item['name']=String.fromCharCode('A'.charCodeAt()+i);
+     item['field']=String.fromCharCode('A'.charCodeAt()+i);
+     item['width']=80;
+     item['editor']=Slick.Editors.Text;
+     columns.push(item);
+ }
+  var options = {
+    editable: true,
+    enableAddRow: true,
+    enableCellNavigation: true,
+    asyncEditorLoading: false,
+    autoEdit: false
+  };
+  
+  $(function () {
+    for (var i = 0; i < maxrow; i++) {
+      var d = (data[i] = {});
+      for (var j=0;j< maxcol;j++){
+          var col= String.fromCharCode('A'.charCodeAt()+j);
+          d[col]=rows[i][j];
+      }
+      //d["A"] = "Task " + i;
+      //d["B"] = "This is a sample task description.\n  It can be multiline";
+      //d["C"] = "5 days";
+      //d["D"] = Math.round(Math.random() * 100);
+      //d["E"] = "01/01/2009";
+      //d["F"] = "01/05/2009";
+      //d["G"] = (i % 5 == 0);
+    }
+
+    grid = new Slick.Grid("#myGrid", data, columns, options);
+
+    grid.setSelectionModel(new Slick.CellSelectionModel());
+
+    grid.onAddNewRow.subscribe(function (e, args) {
+      var item = args.item;
+      grid.invalidateRow(data.length);
+      data.push(item);
+      grid.updateRowCount();
+      grid.render();
+    });
+  })
+</script>
+</body>
+</html>

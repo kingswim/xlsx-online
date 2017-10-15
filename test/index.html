@@ -45,10 +45,9 @@ Use readAsBinaryString: (when available) <input type="checkbox" name="userabs" c
 </pre>
 <pre id="out"></pre>
 <div id="htmlout"></div>
-<div id="container"></div>
 <br />
 <script src="shim.js"></script>
-<script src="dist/xlsx.js"></script>
+<script src="xlsx.full.min.js"></script>
 <script>
 /*jshint browser:true */
 /* eslint-env browser */
@@ -79,26 +78,23 @@ var process_wb = (function() {
 	var to_json = function to_json(workbook) {
 		var result = {};
 		workbook.SheetNames.forEach(function(sheetName) {
-			var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName],{raw:true,header:1});
+			var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName]);
 			if(roa.length) result[sheetName] = roa;
 		});
-    alert(result);
 		return JSON.stringify(result, 2, 2);
 	};
-     
+
 	var to_csv = function to_csv(workbook) {
 		var result = [];
 		workbook.SheetNames.forEach(function(sheetName) {
-			var csv1 = X.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-      var csv = "["+csv1+"]"
-			if(csv.length>2){
+			var csv = X.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+			if(csv.length){
+				result.push("SHEET: " + sheetName);
+				result.push("");
 				result.push(csv);
 			}
 		});
-    alert(result);
-    result=JSON.parse(result);
-    alert(result);
-		return result;
+		return result.join("\n");
 	};
 
 	var to_fmla = function to_fmla(workbook) {
@@ -132,17 +128,7 @@ var process_wb = (function() {
 			case "json": output = to_json(wb); break;
 			default: output = to_csv(wb);
 		}
-    localStorage.setItem("xlsxcontent",output);
-    window.location.href = "b.html";
-    alert(output);
-    var aim = JSON.parse(output);
-    var tt=aim['Sheet1'];
-    var ws = XLSX.utils.aoa_to_sheet(tt);
-    document.getElementById("container").innerHTML = XLSX.utils.sheet_to_html(ws, { editable:true }).replace("<table>", '<table id="table" border="1">');  
 		if(OUT.innerText === undefined) OUT.textContent = output;
-// 插入slickgrid代码
-
-      
 		else OUT.innerText = output;
 		if(typeof console !== 'undefined') console.log("output", new Date());
 	};

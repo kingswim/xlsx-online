@@ -35,25 +35,26 @@ Output Format: <select name="format" onchange="setfmt()">
 <option value="html"> HTML</option>
 </select><br />
 <div id="drop">Drop a spreadsheet file here to see sheet data</div>
-<input type="file" name="xlfile" id="xlf" /> ... or click here to select a file
+<input type="file" name/="xlfile" id="xlf" /> ... or click here to select a file
 
 <textarea id="b64data">... or paste a base64-encoding here</textarea>
 <input type="button" id="dotext" value="Click here to process the base64 text" onclick="b64it();"/><br />
 <b>Advanced Demo Options:</b>
 Use Web Workers: (when available) <input type="checkbox" name="useworker" checked>
 Use readAsBinaryString: (when available) <input type="checkbox" name="userabs" checked>
+<div id="container"></div>
 </pre>
 <pre id="out"></pre>
 <div id="htmlout"></div>
-<div id="container"></div>
 <br />
 <script src="shim.js"></script>
 <script src="dist/xlsx.js"></script>
 <script>
 /*jshint browser:true */
 /* eslint-env browser */
-/* eslint no-use-before-define:0 */
-/*global Uint8Array, Uint16Array, ArrayBuffer */
+/* eslinl
+   -use-before-define:0 */
+/*globa Uint8Array, Uint16Array, ArrayBuffer */
 /*global XLSX */
 var X = XLSX;
 var XW = {
@@ -68,7 +69,7 @@ var global_wb;
 var process_wb = (function() {
 	var OUT = document.getElementById('out');
 	var HTMLOUT = document.getElementById('htmlout');
-
+  alert("hi");
 	var get_format = (function() {
 		var radios = document.getElementsByName( "format" );
 		return function() {
@@ -79,27 +80,24 @@ var process_wb = (function() {
 	var to_json = function to_json(workbook) {
 		var result = {};
 		workbook.SheetNames.forEach(function(sheetName) {
-			var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName],{raw:true,header:1});
+			var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName]);
 			if(roa.length) result[sheetName] = roa;
 		});
-    alert(result);
 		return JSON.stringify(result, 2, 2);
 	};
-     
+
 	var to_csv = function to_csv(workbook) {
 		var result = [];
 		workbook.SheetNames.forEach(function(sheetName) {
 			var csv1 = X.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-      var csv = "["+csv1+"]"
+      alert(csv1);
+      var csv="["+csv1+"]";
 			if(csv.length>2){
+        alert(csv.length);
 				result.push(csv);
 			}
 		});
-    alert(result);
-    result=JSON.parse(result);
-    alert(result);
 		return result;
-	};
 
 	var to_fmla = function to_fmla(workbook) {
 		var result = [];
@@ -132,17 +130,11 @@ var process_wb = (function() {
 			case "json": output = to_json(wb); break;
 			default: output = to_csv(wb);
 		}
-    localStorage.setItem("xlsxcontent",output);
-    window.location.href = "b.html";
-    alert(output);
-    var aim = JSON.parse(output);
-    var tt=aim['Sheet1'];
-    var ws = XLSX.utils.aoa_to_sheet(tt);
+    alert("hello");
+    var ws = XLSX.utils.aoa_to_sheet(output);
     document.getElementById("container").innerHTML = XLSX.utils.sheet_to_html(ws, { editable:true }).replace("<table>", '<table id="table" border="1">');  
+    alert(ws);
 		if(OUT.innerText === undefined) OUT.textContent = output;
-// 插入slickgrid代码
-
-      
 		else OUT.innerText = output;
 		if(typeof console !== 'undefined') console.log("output", new Date());
 	};
